@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Group Chat</title>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e1f25, #2c2f36);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* 🔥 glass container */
+        .chat-container {
+            width: 420px;
+            height: 650px;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* 🔥 header */
+        .chat-header {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            letter-spacing: 0.5px;
+        }
+
+        /* 🔥 messages area */
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: opacity 0.2s ease;
+        }
+
+        /* 🔥 message bubble base */
+        .message {
+            padding: 6px 10px;
+            border-radius: 14px;
+            max-width: 75%;
+            width: fit-content;
+            font-size: 14px;
+            line-height: 1.35;
+
+            white-space: pre-wrap;
+            word-break: break-all;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            transition: all 0.15s ease;
+
+            animation: fadeIn 0.2s ease;
+        }
+
+        /* 🔥 your messages */
+        .user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 5px 15px rgba(74,144,226,0.3);
+        }
+
+        /* 🔥 others */
+        .server {
+            align-self: flex-start;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-bottom-left-radius: 6px;
+        }
+        .server .username {
+            color: #e6f0ff;
+        }
+        .user .username {
+            color: #2c2c2c;
+         }
+        .chat-container {
+            backdrop-filter: blur(10px);
+            background: rgb(39 39 39 / 0.85);
+        }
+
+
+        /* 🔥 username */
+        .username {
+            font-size: 13px;
+            opacity: 0.85;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.1;
+        }
+        .message div:last-child {
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        /* 🔥 input area */
+        .chat-input {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            gap: 10px;
+            background: rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* 🔥 input */
+        .chat-input input {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        /* placeholder */
+        .chat-input input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* 🔥 button */
+        .chat-input button {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        /* hover effect */
+        .chat-input button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(74,144,226,0.4);
+        }
+
+        /* 🔥 counter */
+        #counter {
+            text-align: right;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            padding: 5px 15px;
+        }
+
+        /* 🔥 animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+<div class="chat-container">
+    <div class="chat-header" id="header">Group Chat</div>
+
+    <div class="chat-messages" id="messages"></div>
+    <div class="chat-input">
+        <input type="text" id="input" maxlength="200" placeholder="Escribe un mensaje..." />
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
+
+    <div id="counter">0 / 200</div>
+
+
+</div>
+
+<script>
+    const BASE_CHAT_URL = "http://localhost:8080/chat";
+    const GET_MESSAGES_URL = BASE_CHAT_URL + "/messages";
+    const POST_MESSAGE_URL = BASE_CHAT_URL + "/message";
+    const GET_USER_URL = BASE_CHAT_URL + "/user";
+
+    let userId = null;
+    let username = null;
+
+    function generateUsername() {
+        const adjectives = ["Fast", "Blue", "Silent", "Crazy", "Happy"];
+        const nouns = ["Tiger", "Pizza", "Dragon", "Coder", "Panda"];
+
+        const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const noun = nouns[Math.floor(Math.random() * nouns.length)];
+        const number = Math.floor(Math.random() * 100);
+
+        return adj + noun + number;
+    }
+
+    async function initUser() {
+
+        const savedUserId = localStorage.getItem("userId");
+        const savedUsername = localStorage.getItem("username");
+
+        // CASE 1: already exists
+        if (savedUserId && savedUsername) {
+            userId = parseInt(savedUserId);
+            username = savedUsername;
+
+            document.getElementById("header").innerText =
+                "Group Chat (" + username + ")";
+
+            console.log("Loaded from storage:", userId, username);
+            return;
+        }
+
+        // CASE 2: create new user
+        username = generateUsername();
+
+        const res = await fetch(GET_USER_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username })
+        });
+
+        const data = await res.json();
+
+        console.log("USER RESPONSE:", data);
+
+        userId = data.id;   // IMPORTANT
+
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("username", username);
+
+        document.getElementById("header").innerText =
+            "Group Chat (" + username + ")";
+    }
+
+    function addMessage(username, text, isOwn) {
+        const msg = document.createElement("div");
+        msg.classList.add("message", isOwn ? "user" : "server");
+
+        msg.innerHTML = `
+            <div class="username">${username}</div>
+            <div>${text}</div>
+        `;
+
+        document.getElementById("messages").appendChild(msg);
+        document.getElementById("messages").scrollTop =
+            document.getElementById("messages").scrollHeight;
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById("input");
+        const text = input.value;
+
+        if (text.trim().length === 0) return;
+
+        if (text.length > 200) {
+            alert("Max 200 characters");
+            input.value = text.substring(0, 200);
+            return;
+        }
+
+        input.value = "";
+
+        try {
+            await fetch(POST_MESSAGE_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    content: text
+                })
+            });
+
+        } catch (err) {
+            addMessage("SYSTEM", "Error connecting to server", false);
+        }
+    }
+    let lastMessageId = 0;
+
+    async function loadMessages() {
+        try {
+            const res = await fetch(GET_MESSAGES_URL);
+            const data = await res.json();
+
+            data.forEach(msg => {
+                const id = parseInt(msg.id); // IMPORTANT
+
+                if (id > lastMessageId) {
+                    const isOwn = msg.userId === userId;
+                    addMessage(msg.username, msg.content, isOwn);
+                    lastMessageId = id;
+                }
+            });
+
+        } catch (err) {
+            addMessage("SYSTEM", "Could not load messages", false);
+        }
+    }
+
+    async function start() {
+        await initUser();
+        await loadMessages();
+        setInterval(loadMessages, 1000);
+
+        const input = document.getElementById("input");
+        const counter = document.getElementById("counter");
+
+        counter.innerText = "0 / 200";
+
+        input.addEventListener("input", () => {
+            const length = input.value.length;
+
+            // hard limit (extra safety)
+            if (length > 200) {
+                input.value = input.value.slice(0, 200);
+            }
+
+            counter.innerText = `${input.value.length} / 200`;
+        });
+
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+        console.log("Counter element:", document.getElementById("counter"));
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        start();
+    });
+</script>
+
+</body>
+</html>
