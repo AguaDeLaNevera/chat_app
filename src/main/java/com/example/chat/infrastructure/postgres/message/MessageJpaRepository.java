@@ -1,6 +1,5 @@
-package com.example.chat.infrastructure;
+package com.example.chat.infrastructure.postgres.message;
 
-import com.example.chat.domain.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

@@ -1,4 +1,4 @@
-package com.example.chat.infrastructure;
+package com.example.chat.infrastructure.postgres.user;
 
 import com.example.chat.domain.User;
 import com.example.chat.domain.UserRepository;
@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class JpaUserRepositoryAdapter implements UserRepository {
+public class UserJpaRepositoryAdapter implements UserRepository {
     private final UserJpaRepository jpaRepo;
 
-    public JpaUserRepositoryAdapter(UserJpaRepository jpaRepo) {
+    public UserJpaRepositoryAdapter(UserJpaRepository jpaRepo) {
         this.jpaRepo = jpaRepo;
     }
 

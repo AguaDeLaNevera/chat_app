@@ -1,5 +1,6 @@
-package com.example.chat.infrastructure;
+package com.example.chat.infrastructure.postgres.message;
 
+import com.example.chat.infrastructure.postgres.user.UserEntity;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;

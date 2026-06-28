@@ -1,4 +1,4 @@
-package com.example.chat.infrastructure;
+package com.example.chat.infrastructure.postgres.user;
 
 import jakarta.persistence.*;
 

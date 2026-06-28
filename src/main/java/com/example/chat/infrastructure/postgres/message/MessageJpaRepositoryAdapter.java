@@ -1,7 +1,8 @@
-package com.example.chat.infrastructure;
+package com.example.chat.infrastructure.postgres.message;
 
 import com.example.chat.domain.Message;
 import com.example.chat.domain.MessageRepository;
+import com.example.chat.infrastructure.postgres.user.UserEntity;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
@@ -9,10 +10,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class JpaMessageRepositoryAdapter implements MessageRepository {
+public class MessageJpaRepositoryAdapter implements MessageRepository {
     private final MessageJpaRepository jpaRepo;
 
-    public JpaMessageRepositoryAdapter(MessageJpaRepository jpaRepo) {
+    public MessageJpaRepositoryAdapter(MessageJpaRepository jpaRepo) {
         this.jpaRepo = jpaRepo;
     }
 
