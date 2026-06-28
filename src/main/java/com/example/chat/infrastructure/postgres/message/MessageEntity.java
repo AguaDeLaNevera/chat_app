@@ -3,7 +3,7 @@ package com.example.chat.infrastructure.postgres.message;
 import com.example.chat.infrastructure.postgres.user.UserEntity;
 import jakarta.persistence.*;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 @Entity
 @Table(name="messages")
@@ -18,7 +18,7 @@ public class MessageEntity {
     @Column(name="content")
     private String content;
     @Column(name="sent_at")
-    private Timestamp sentAt;
+    private Instant sentAt;
 
     public void setId(int id) {
         this.id = id;
@@ -38,10 +38,10 @@ public class MessageEntity {
     public String getContent() {
         return content;
     }
-    public void setSentAt(Timestamp sentAt) {
+    public void setSentAt(Instant sentAt) {
         this.sentAt = sentAt;
     }
-    public Timestamp getSentAt() {
+    public Instant getSentAt() {
         return sentAt;
     }
 

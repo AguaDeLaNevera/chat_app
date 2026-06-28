@@ -4,7 +4,7 @@ import com.example.chat.domain.Message;
 import com.example.chat.domain.MessageRepository;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -14,7 +14,7 @@ public class MessageUseCase {
     public MessageUseCase(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
-    public Message sendMessage(int id, int userId, String content, Timestamp sentAt) {
+    public Message sendMessage(int id, int userId, String content, Instant sentAt) {
         Message message = new Message(id, userId, content, sentAt);
         return messageRepository.save(message);
     }
@@ -28,7 +28,7 @@ public class MessageUseCase {
     public List<Message> findAllByContent(String content){
         return messageRepository.findAllByContent(content);
     }
-    public List<Message> findAllBySentAt(Timestamp sentAt){
+    public List<Message> findAllBySentAt(Instant sentAt){
         return messageRepository.findAllBySentAt(sentAt);
     }
 }

@@ -1,6 +1,6 @@
 package com.example.chat.domain;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,5 +10,5 @@ public interface MessageRepository {
     List<Message> findAll();
     List<Message> findAllByUserId(int userId);
     List<Message> findAllByContent(String content);
-    List<Message> findAllBySentAt(Timestamp sentAt);
+    List<Message> findAllBySentAt(Instant sentAt);
 }

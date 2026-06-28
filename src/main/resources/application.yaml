@@ -10,7 +10,6 @@ spring:
     username: postgres
     password: caca123
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,7 +20,12 @@ spring:
   docker:
     compose:
       enabled: false
+  mongodb:
+    uri: mongodb://localhost:27017/chat
 
 logging:
   level:
     org.hibernate.SQL: DEBUG
+
+db:
+  type: mongo

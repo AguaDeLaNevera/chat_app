@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -56,8 +57,8 @@ public class ChatController {
                 0,
                 request.userId(),
                 request.content(),
-                new java.sql.Timestamp(System.currentTimeMillis()));
-
+                Instant.now()
+        );
     }
     @PostMapping("/user")
     public User createUser(@RequestBody CreateUserRequest request) {
