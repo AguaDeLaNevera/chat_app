@@ -1,13 +1,12 @@
 package com.example.chat.infrastructure;
 
+import com.example.chat.application.JwtService;
 import com.example.chat.application.MessageUseCase;
 import com.example.chat.application.UserUseCase;
 import com.example.chat.domain.Message;
 import com.example.chat.domain.User;
-import com.example.chat.infrastructure.dto.CreateMessageRequest;
-import com.example.chat.infrastructure.dto.CreateUserRequest;
-import com.example.chat.infrastructure.dto.MessageResponse;
-import com.example.chat.infrastructure.dto.UserResponse;
+import com.example.chat.infrastructure.dto.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.InetAddress;
@@ -22,10 +21,12 @@ public class ChatController {
 
     private final MessageUseCase messageUseCase;
     private final UserUseCase userUseCase;
+    private final JwtService jwtService;
 
-    public ChatController(MessageUseCase messageUseCase, UserUseCase userUseCase) {
+    public ChatController(MessageUseCase messageUseCase, UserUseCase userUseCase, JwtService jwtService) {
         this.messageUseCase = messageUseCase;
         this.userUseCase = userUseCase;
+        this.jwtService = jwtService;
     }
     // API "GET" ENDPOINTS
     @GetMapping("/messages")
@@ -51,20 +52,31 @@ public class ChatController {
     }
     // API "POST" ENDPOINTS
     @PostMapping("/message")
-    public Message sendMessage(@RequestBody CreateMessageRequest request) {
-
+    public Message sendMessage(@RequestBody CreateMessageRequest request, Authentication authentication) {
+        int userId = Integer.parseInt(authentication.getName());
         return messageUseCase.sendMessage(
                 0,
-                request.userId(),
+                userId,
                 request.content(),
                 Instant.now()
         );
     }
-    @PostMapping("/user")
-    public User createUser(@RequestBody CreateUserRequest request) {
-        return userUseCase.createUser(
-                request.username()
+    @PostMapping("/register")
+    public UserResponse createUser(@RequestBody CreateUserRequest request) {
+        User user = userUseCase.createUser(
+                request.username(),
+                request.password()
         );
+        return toUserResponse(user);
+    }
+    @PostMapping("/login")
+    public LoginResponse login(@RequestBody LoginRequest request) {
+        User user = userUseCase.login(
+                request.username(),
+                request.password()
+        );
+        String token = jwtService.generateToken(user);
+        return new LoginResponse(token);
     }
     // DTO CONVERTERS
     private UserResponse toUserResponse(User user) {
@@ -79,6 +91,6 @@ public class ChatController {
                 message.userId(),
                 userUseCase.getUsernameWithId(message.userId()),
                 message.content()
-                );
+        );
     }
 }

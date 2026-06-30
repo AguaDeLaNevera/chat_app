@@ -27,5 +27,9 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
 
+
+jwt:
+  secret: "mySuperSecretKeyThatIsAtLeast32CharactersLong!"
+  expiration: 86400000
 db:
-  type: mongo
+  type: postgres

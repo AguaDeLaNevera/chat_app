@@ -48,10 +48,11 @@ public class UserMongoRepositoryAdapter implements UserRepository {
         UserDocument userDocument = new UserDocument();
         userDocument.setId(user.id());
         userDocument.setUsername(user.username());
+        userDocument.setPassword(user.password());
         return userDocument;
     }
     private User toDomain(UserDocument userDocument) {
-        return new User(userDocument.getId(), userDocument.getUsername());
+        return new User(userDocument.getId(), userDocument.getUsername(), userDocument.getPassword());
     }
 
 }

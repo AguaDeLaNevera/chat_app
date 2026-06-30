@@ -200,61 +200,12 @@
     const BASE_CHAT_URL = "http://localhost:8080/chat";
     const GET_MESSAGES_URL = BASE_CHAT_URL + "/messages";
     const POST_MESSAGE_URL = BASE_CHAT_URL + "/message";
-    const GET_USER_URL = BASE_CHAT_URL + "/user";
 
+    let token = null;
     let userId = null;
-    let username = null;
 
-    function generateUsername() {
-        const adjectives = ["Fast", "Blue", "Silent", "Crazy", "Happy"];
-        const nouns = ["Tiger", "Pizza", "Dragon", "Coder", "Panda"];
-
-        const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
-        const noun = nouns[Math.floor(Math.random() * nouns.length)];
-        const number = Math.floor(Math.random() * 100);
-
-        return adj + noun + number;
-    }
-
-    async function initUser() {
-
-        const savedUserId = localStorage.getItem("userId");
-        const savedUsername = localStorage.getItem("username");
-
-        // CASE 1: already exists
-        if (savedUserId && savedUsername) {
-            userId = parseInt(savedUserId);
-            username = savedUsername;
-
-            document.getElementById("header").innerText =
-                "Group Chat (" + username + ")";
-
-            console.log("Loaded from storage:", userId, username);
-            return;
-        }
-
-        // CASE 2: create new user
-        username = generateUsername();
-
-        const res = await fetch(GET_USER_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ username })
-        });
-
-        const data = await res.json();
-
-        console.log("USER RESPONSE:", data);
-
-        userId = data.id;   // IMPORTANT
-
-        localStorage.setItem("userId", userId);
-        localStorage.setItem("username", username);
-
-        document.getElementById("header").innerText =
-            "Group Chat (" + username + ")";
+    function parseJwt(jwt) {
+        return JSON.parse(atob(jwt.split(".")[1]));
     }
 
     function addMessage(username, text, isOwn) {
@@ -273,47 +224,72 @@
 
     async function sendMessage() {
         const input = document.getElementById("input");
-        const text = input.value;
+        const text = input.value.trim();
 
-        if (text.trim().length === 0) return;
+        if (text.length === 0)
+            return;
 
         if (text.length > 200) {
-            alert("Max 200 characters");
-            input.value = text.substring(0, 200);
+            alert("Maximum 200 characters");
             return;
         }
 
         input.value = "";
 
         try {
-            await fetch(POST_MESSAGE_URL, {
+            const response = await fetch(POST_MESSAGE_URL, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
                 },
                 body: JSON.stringify({
-                    userId: userId,
                     content: text
                 })
             });
+
+            if (response.status === 401) {
+                localStorage.clear();
+                window.location.href = "login.html";
+            }
 
         } catch (err) {
             addMessage("SYSTEM", "Error connecting to server", false);
         }
     }
+
     let lastMessageId = 0;
 
     async function loadMessages() {
+
         try {
-            const res = await fetch(GET_MESSAGES_URL);
-            const data = await res.json();
+
+            const response = await fetch(GET_MESSAGES_URL, {
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+            if (response.status === 401) {
+                localStorage.clear();
+                window.location.href = "login.html";
+                return;
+            }
+
+            const data = await response.json();
 
             data.forEach(msg => {
-                const id = parseInt(msg.id); // IMPORTANT
+
+                const id = Number(msg.id);
 
                 if (id > lastMessageId) {
-                    const isOwn = msg.userId === userId;
-                    addMessage(msg.username, msg.content, isOwn);
+
+                    addMessage(
+                        msg.username,
+                        msg.content,
+                        msg.userId === userId
+                    );
+
                     lastMessageId = id;
                 }
             });
@@ -324,8 +300,23 @@
     }
 
     async function start() {
-        await initUser();
+
+        token = localStorage.getItem("token");
+
+        if (!token) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const payload = parseJwt(token);
+
+        userId = Number(payload.sub);
+
+        document.getElementById("header").innerText =
+            "Group Chat (" + payload.username + ")";
+
         await loadMessages();
+
         setInterval(loadMessages, 1000);
 
         const input = document.getElementById("input");
@@ -334,27 +325,25 @@
         counter.innerText = "0 / 200";
 
         input.addEventListener("input", () => {
-            const length = input.value.length;
 
-            // hard limit (extra safety)
-            if (length > 200) {
-                input.value = input.value.slice(0, 200);
+            if (input.value.length > 200) {
+                input.value = input.value.substring(0, 200);
             }
 
             counter.innerText = `${input.value.length} / 200`;
         });
 
-        input.addEventListener("keydown", (event) => {
+        input.addEventListener("keydown", event => {
+
             if (event.key === "Enter") {
                 event.preventDefault();
                 sendMessage();
             }
+
         });
-        console.log("Counter element:", document.getElementById("counter"));
     }
-    document.addEventListener("DOMContentLoaded", () => {
-        start();
-    });
+
+    document.addEventListener("DOMContentLoaded", start);
 </script>
 
 </body>

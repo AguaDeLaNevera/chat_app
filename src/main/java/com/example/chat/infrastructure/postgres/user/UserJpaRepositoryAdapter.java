@@ -42,10 +42,11 @@ public class UserJpaRepositoryAdapter implements UserRepository {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(user.id());
         userEntity.setUsername(user.username());
+        userEntity.setPassword(user.password());
         return userEntity;
     }
     private User toDomain(UserEntity userEntity) {
-        return new User(userEntity.getId(), userEntity.getUsername());
+        return new User(userEntity.getId(), userEntity.getUsername(), userEntity.getPassword());
     }
 
 }
