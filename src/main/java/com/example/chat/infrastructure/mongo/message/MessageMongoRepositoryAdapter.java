@@ -4,6 +4,7 @@ import com.example.chat.domain.Message;
 import com.example.chat.domain.MessageRepository;
 import com.example.chat.infrastructure.mongo.SequenceGeneratorService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;

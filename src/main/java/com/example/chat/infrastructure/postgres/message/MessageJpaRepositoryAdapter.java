@@ -4,6 +4,7 @@ import com.example.chat.domain.Message;
 import com.example.chat.domain.MessageRepository;
 import com.example.chat.infrastructure.postgres.user.UserEntity;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@ConditionalOnProperty(name="db.type", havingValue = "postgres",  matchIfMissing = true)
+@ConditionalOnProperty(name="db.type", havingValue = "postgres")
 public class MessageJpaRepositoryAdapter implements MessageRepository {
     private final MessageJpaRepository jpaRepo;
 

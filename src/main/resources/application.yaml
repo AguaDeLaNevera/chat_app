@@ -1,6 +1,11 @@
 spring:
   application:
     name: chat
+    autoconfigure:
+      exclude:
+        - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+        - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+        - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}
@@ -18,15 +23,13 @@ spring:
     compose:
       enabled: false
   mongodb:
-    uri: mongodb://localhost:27017/chat
-
+    uri: mongodb://db:27017/chat_db
 logging:
   level:
     org.hibernate.SQL: DEBUG
-
-
 jwt:
   secret: "mySuperSecretKeyThatIsAtLeast32CharactersLong!"
   expiration: 86400000
 db:
   type: mongo
+
