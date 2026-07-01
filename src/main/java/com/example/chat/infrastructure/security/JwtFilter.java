@@ -1,6 +1,5 @@
 package com.example.chat.infrastructure.security;
 
-import com.example.chat.application.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

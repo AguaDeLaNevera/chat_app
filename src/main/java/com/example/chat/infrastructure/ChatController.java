@@ -1,6 +1,6 @@
 package com.example.chat.infrastructure;
 
-import com.example.chat.application.JwtService;
+import com.example.chat.infrastructure.security.JwtService;
 import com.example.chat.application.MessageUseCase;
 import com.example.chat.application.UserUseCase;
 import com.example.chat.domain.Message;

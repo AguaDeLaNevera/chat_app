@@ -1,4 +1,4 @@
-package com.example.chat.application;
+package com.example.chat.infrastructure.security;
 
 import com.example.chat.domain.User;
 import io.jsonwebtoken.Jwts;
