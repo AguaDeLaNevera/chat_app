@@ -1,0 +1,20 @@
+# Build output
+target/
+build/
+out/
+
+# IDE files
+.idea/
+*.iml
+
+# Git
+.git/
+.gitignore
+
+# Temporary files
+*.tmp
+*.swp
+
+# Environment files
+.env
+.env.*
