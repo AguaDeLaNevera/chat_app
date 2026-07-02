@@ -10,4 +10,4 @@ spring:
       - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
 
   mongodb:
-    uri: mongodb://db:27017/chat_db
+    uri: mongodb://localhost:27017/chat_db
