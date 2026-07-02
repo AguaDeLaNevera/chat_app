@@ -197,7 +197,8 @@
 </div>
 
 <script>
-    const BASE_CHAT_URL = "http://localhost:8080/chat";
+    // /chat for REST API
+    const BASE_CHAT_URL = "http://localhost:8080/graphql";
     const GET_MESSAGES_URL = BASE_CHAT_URL + "/messages";
     const POST_MESSAGE_URL = BASE_CHAT_URL + "/message";
 
@@ -237,14 +238,24 @@
         input.value = "";
 
         try {
-            const response = await fetch(POST_MESSAGE_URL, {
+            //POST_MESSAGES_URL
+            const response = await fetch(BASE_CHAT_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + token
                 },
                 body: JSON.stringify({
-                    content: text
+                    query: `
+                        mutation {
+                            sendMessage(content: "${text}") {
+                                id
+                                userId
+                                content
+                                sentAt
+                            }
+                        }
+                    `
                 })
             });
 
@@ -264,10 +275,25 @@
 
         try {
 
-            const response = await fetch(GET_MESSAGES_URL, {
+            //GET_MESSAGES_URL
+            const response = await fetch(BASE_CHAT_URL, {
+                method: "POST",
                 headers: {
+                    "Content-Type": "application/json",
                     "Authorization": "Bearer " + token
-                }
+                },
+                body: JSON.stringify({
+                    query: `
+                        query {
+                            messages {
+                                id
+                                userId
+                                username
+                                content
+                            }
+                        }
+                    `
+                })
             });
 
             if (response.status === 401) {
@@ -277,8 +303,9 @@
             }
 
             const data = await response.json();
+            const messages = data.data.messages;
 
-            data.forEach(msg => {
+            messages.forEach(msg => {
 
                 const id = Number(msg.id);
 

@@ -1,4 +1,5 @@
-const BASE_URL = "http://localhost:8080/chat";
+// /chat for REST API
+const BASE_URL = "http://localhost:8080/graphql";
 
 async function login(){
 
@@ -15,8 +16,8 @@ async function login(){
     }
 
     try{
-
-        const response = await fetch(BASE_URL + "/login",{
+        // /login for REST API
+        const response = await fetch(BASE_URL,{
 
             method:"POST",
 
@@ -25,12 +26,17 @@ async function login(){
             },
 
             body:JSON.stringify({
-
-                username,
-                password
-
+                query: `
+                mutation {
+                    login(
+                        username: "${username}",
+                        password: "${password}"
+                    ){
+                        token
+                    }
+                }
+                `
             })
-
         });
 
         if(!response.ok){
@@ -43,7 +49,7 @@ async function login(){
 
         const data = await response.json();
 
-        localStorage.setItem("token",data.token);
+        localStorage.setItem("token",data.data.login.token);
 
         window.location.href="index.html";
 

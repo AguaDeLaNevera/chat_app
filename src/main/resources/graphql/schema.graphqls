@@ -1,0 +1,34 @@
+type UserResponse {
+    id: Int!
+    username: String!
+}
+
+type MessageResponse {
+    id: Int!
+    userId: Int!
+    username: String!
+    content: String!
+}
+
+type LoginResponse {
+    token: String!
+}
+
+type Message {
+    id: Int!
+    userId: Int!
+    content: String!
+    sentAt: String!
+}
+
+type Query {
+    users: [UserResponse!]!
+    user(id: Int!): UserResponse
+    messages: [MessageResponse!]!
+}
+
+type Mutation {
+    register(username: String!, password: String!): UserResponse
+    login(username: String!, password: String!): LoginResponse
+    sendMessage(content: String!): Message
+}

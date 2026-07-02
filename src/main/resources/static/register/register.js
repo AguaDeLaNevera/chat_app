@@ -1,4 +1,5 @@
-const BASE_URL = "http://localhost:8080/chat";
+// /chat for REST API
+const BASE_URL = "http://localhost:8080/graphql";
 
 async function register() {
 
@@ -12,8 +13,8 @@ async function register() {
     }
 
     try{
-
-        const response = await fetch(BASE_URL + "/register",{
+        // /register for REST API
+        const response = await fetch(BASE_URL,{
 
             method:"POST",
 
@@ -22,10 +23,17 @@ async function register() {
             },
 
             body:JSON.stringify({
-
-                username,
-                password
-
+                query: `
+                mutation {
+                    register(
+                        username: "${username}",
+                        password: "${password}"
+                    ){
+                        id
+                        username
+                    }
+                }
+                `
             })
 
         });

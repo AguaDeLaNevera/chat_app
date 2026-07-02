@@ -15,8 +15,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/chat")
+//@RestController
+//@RequestMapping("/chat")
 public class ChatController {
 
     private final MessageUseCase messageUseCase;
