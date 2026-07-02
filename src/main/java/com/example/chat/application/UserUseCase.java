@@ -2,8 +2,12 @@ package com.example.chat.application;
 
 import com.example.chat.domain.User;
 import com.example.chat.domain.UserRepository;
+import com.example.chat.infrastructure.exceptions.InvalidCredentialsException;
+import com.example.chat.infrastructure.exceptions.UserAlreadyExistsException;
+import com.example.chat.infrastructure.exceptions.UserNotFoundException;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,14 +32,14 @@ public class UserUseCase {
                 .findFirst()
                 .isPresent()
         ) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+            throw new UserAlreadyExistsException();
         }
         User user = new User(0, username, encodedPassword);
         return userRepository.save(user);
     }
 
     public User findUserById(int id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
 
     public List<User> findAll() {
@@ -54,9 +58,9 @@ public class UserUseCase {
         User user = userRepository.findByUsername(username)
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invaid username or password"));
+                .orElseThrow(InvalidCredentialsException::new);
         if (!passwordEncoder.matches(password, user.password())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invaid username or password");
+            throw new InvalidCredentialsException();
         }
         return user;
     }
