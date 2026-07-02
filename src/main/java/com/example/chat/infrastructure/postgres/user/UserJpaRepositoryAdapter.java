@@ -3,14 +3,15 @@ package com.example.chat.infrastructure.postgres.user;
 import com.example.chat.domain.User;
 import com.example.chat.domain.UserRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Profile("postgres")
 @Repository
-@ConditionalOnProperty(name="db.type", havingValue = "postgres")
 public class UserJpaRepositoryAdapter implements UserRepository {
     private final UserJpaRepository jpaRepo;
 

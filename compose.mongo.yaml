@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mongo:7
+
+    environment:
+      MONGO_INITDB_DATABASE: chat_db
+
+    volumes:
+      - mongo-data:/data/db
+
+    networks:
+      - backend-network
+
+    ports:
+      - "27017:27017"
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  app:
+    environment:
+      SPRING_PROFILES_ACTIVE: mongo
+      SPRING_DATA_MONGODB_URI: mongodb://db:27017/chat_db

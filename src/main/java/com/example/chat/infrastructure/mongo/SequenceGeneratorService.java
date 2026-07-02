@@ -1,5 +1,6 @@
 package com.example.chat.infrastructure.mongo;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -8,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Service
+@Profile("mongo")
 public class SequenceGeneratorService {
 
     private final MongoOperations mongoOperations;
