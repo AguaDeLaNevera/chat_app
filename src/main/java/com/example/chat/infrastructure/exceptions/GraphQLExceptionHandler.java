@@ -4,8 +4,9 @@ import org.springframework.graphql.data.method.annotation.GraphQlExceptionHandle
 import org.springframework.stereotype.Controller;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 
-@Controller
+@ControllerAdvice
 public class GraphQLExceptionHandler {
 
     @GraphQlExceptionHandler({

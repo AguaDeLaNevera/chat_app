@@ -1,13 +1,13 @@
 // /chat for REST API
 const BASE_URL = "http://localhost:8080/graphql";
 
-async function login(){
+async function login() {
 
     const username = document.getElementById("username").value.trim();
 
     const password = document.getElementById("password").value;
 
-    if(username.length===0 || password.length===0){
+    if (username.length === 0 || password.length === 0) {
 
         document.getElementById("error").innerText =
             "Fill every field";
@@ -15,17 +15,17 @@ async function login(){
         return;
     }
 
-    try{
+    try {
         // /login for REST API
-        const response = await fetch(BASE_URL,{
+        const response = await fetch(BASE_URL, {
 
-            method:"POST",
+            method: "POST",
 
-            headers:{
-                "Content-Type":"application/json"
+            headers: {
+                "Content-Type": "application/json"
             },
 
-            body:JSON.stringify({
+            body: JSON.stringify({
                 query: `
                 mutation {
                     login(
@@ -39,7 +39,7 @@ async function login(){
             })
         });
 
-        if(!response.ok){
+        if (!response.ok) {
 
             document.getElementById("error").innerText =
                 "Wrong username or password";
@@ -49,12 +49,11 @@ async function login(){
 
         const data = await response.json();
 
-        localStorage.setItem("token",data.data.login.token);
+        localStorage.setItem("token", data.data.login.token);
 
-        window.location.href="index.html";
+        window.location.href = "index.html";
 
-    }
-    catch(e){
+    } catch (e) {
 
         document.getElementById("error").innerText =
             "Cannot connect to server";

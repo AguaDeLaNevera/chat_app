@@ -4,6 +4,7 @@ import com.example.chat.application.MessageUseCase;
 import com.example.chat.application.UserUseCase;
 import com.example.chat.domain.Message;
 import com.example.chat.infrastructure.dto.MessageResponse;
+import com.example.chat.infrastructure.exceptions.InvalidCredentialsException;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -38,6 +39,9 @@ public class MessageResolver {
             @Argument String content,
             Authentication authentication) {
 
+        if(authentication == null){
+            throw new InvalidCredentialsException();
+        }
         int userId = Integer.parseInt(authentication.getName());
 
         return messageUseCase.sendMessage(
