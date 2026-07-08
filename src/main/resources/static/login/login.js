@@ -17,25 +17,19 @@ async function login() {
 
     try {
         // /login for REST API
-        const response = await fetch(BASE_URL, {
+        const response = await fetch("http://localhost:9090/realms/chat/protocol/openid-connect/token", {
 
             method: "POST",
 
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/x-www-form-urlencoded"
             },
 
-            body: JSON.stringify({
-                query: `
-                mutation {
-                    login(
-                        username: "${username}",
-                        password: "${password}"
-                    ){
-                        token
-                    }
-                }
-                `
+            body: new URLSearchParams({
+                grant_type: "password",
+                client_id: "chat-app",
+                username: username,
+                password: password
             })
         });
 
@@ -49,7 +43,8 @@ async function login() {
 
         const data = await response.json();
 
-        localStorage.setItem("token", data.data.login.token);
+        console.log(data);
+        localStorage.setItem("token", data.access_token);
 
         window.location.href = "index.html";
 

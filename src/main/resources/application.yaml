@@ -9,6 +9,14 @@ spring:
     compose:
       enabled: false
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/chat
+
+
+
 logging:
   level:
     org.hibernate.SQL: DEBUG

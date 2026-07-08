@@ -375,10 +375,10 @@
 
         const payload = parseJwt(token);
 
-        userId = Number(payload.sub);
+        userId = payload.sub;
 
         document.getElementById("header").innerText =
-            "Group Chat (" + payload.username + ")";
+            "Group Chat (" + payload.preferred_username + ")";
 
         await loadMessages();
         connectWebSocket()

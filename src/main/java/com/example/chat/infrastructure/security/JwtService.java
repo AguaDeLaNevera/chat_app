@@ -13,7 +13,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-@Service
+//@Service
 public class JwtService {
 
     private static final Logger log = LoggerFactory.getLogger(JwtService.class);
