@@ -199,8 +199,10 @@
 
 
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
 <script>
+    let stompClient = null;
     // /chat for REST API
     const BASE_CHAT_URL = "http://localhost:8080/graphql";
     const GET_MESSAGES_URL = BASE_CHAT_URL + "/messages";
@@ -336,6 +338,32 @@
         }
     }
 
+    function connectWebSocket() {
+
+        const socket = new SockJS("http://localhost:8080/ws");
+
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect(
+            {},
+            function () {
+                stompClient.subscribe("/topic/messages", function (message) {
+
+                    const msg = JSON.parse(message.body);
+
+                    addMessage(
+                        msg.username,
+                        msg.content,
+                        msg.userId === userId
+                    );
+
+                });
+
+            }
+        );
+
+    }
+
     async function start() {
 
         token = localStorage.getItem("token");
@@ -353,8 +381,7 @@
             "Group Chat (" + payload.username + ")";
 
         await loadMessages();
-
-        setInterval(loadMessages, 1000);
+        connectWebSocket()
 
         const input = document.getElementById("input");
         const counter = document.getElementById("counter");

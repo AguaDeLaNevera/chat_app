@@ -37,7 +37,8 @@ public class SecurityConfig {
                                 "/register.html",
                                 "/chat/login",
                                 "/chat/register",
-                                "/graphql"
+                                "/graphql",
+                                "/ws/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

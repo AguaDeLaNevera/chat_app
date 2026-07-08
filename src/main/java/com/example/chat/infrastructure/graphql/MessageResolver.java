@@ -8,6 +8,7 @@ import com.example.chat.infrastructure.exceptions.InvalidCredentialsException;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
@@ -19,11 +20,14 @@ public class MessageResolver {
 
     private final MessageUseCase messageUseCase;
     private final UserUseCase userUseCase;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public MessageResolver(MessageUseCase messageUseCase,
-                           UserUseCase userUseCase) {
+                           UserUseCase userUseCase,
+                           SimpMessagingTemplate messagingTemplate) {
         this.messageUseCase = messageUseCase;
         this.userUseCase = userUseCase;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @QueryMapping
@@ -44,12 +48,18 @@ public class MessageResolver {
         }
         int userId = Integer.parseInt(authentication.getName());
 
-        return messageUseCase.sendMessage(
+        Message message = messageUseCase.sendMessage(
                 0,
                 userId,
                 content,
                 Instant.now()
         );
+
+        MessageResponse messageResponse = toMessageResponse(message);
+
+        messagingTemplate.convertAndSend("/topic/messages", messageResponse);
+
+        return message;
     }
 
     private MessageResponse toMessageResponse(Message message) {
