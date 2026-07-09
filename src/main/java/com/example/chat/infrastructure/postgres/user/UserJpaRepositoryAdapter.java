@@ -37,8 +37,8 @@ public class UserJpaRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public List<User> findByUsername(String username) {
-        return jpaRepo.findByUsername(username).stream().map(this::toDomain).toList();
+    public Optional<User> findByUsername(String username) {
+        return jpaRepo.findByUsername(username).map(this::toDomain);
     }
     private UserEntity toEntity(User user) {
         UserEntity userEntity = new UserEntity();

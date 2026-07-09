@@ -41,8 +41,8 @@ public class UserMongoRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public List<User> findByUsername(String username) {
-        return mongoRepo.findByUsername(username).stream().map(this::toDomain).toList();
+    public Optional<User> findByUsername(String username) {
+        return mongoRepo.findByUsername(username).map(this::toDomain);
     }
     private UserDocument toDocument(User user) {
         UserDocument userDocument = new UserDocument();

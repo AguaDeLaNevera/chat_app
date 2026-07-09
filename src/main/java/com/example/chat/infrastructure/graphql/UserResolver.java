@@ -4,6 +4,7 @@ import com.example.chat.application.UserUseCase;
 import com.example.chat.domain.User;
 import com.example.chat.infrastructure.dto.LoginResponse;
 import com.example.chat.infrastructure.dto.UserResponse;
+import com.example.chat.infrastructure.keycloak.KeycloakService;
 import com.example.chat.infrastructure.security.JwtService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -16,12 +17,12 @@ import java.util.List;
 public class UserResolver {
 
     private final UserUseCase userUseCase;
-    private final JwtService jwtService;
+    private final KeycloakService keycloakService;
 
-    public UserResolver(UserUseCase userUseCase,
-                        JwtService jwtService) {
+    public UserResolver(UserUseCase userUseCase,  KeycloakService keycloakService) {
         this.userUseCase = userUseCase;
-        this.jwtService = jwtService;
+        this.keycloakService = keycloakService;
+
     }
 
     @QueryMapping
@@ -42,22 +43,24 @@ public class UserResolver {
             @Argument String username,
             @Argument String password) {
 
+        keycloakService.createUser(username, password);
+
         User user = userUseCase.createUser(username, password);
 
         return toUserResponse(user);
     }
 
-    @MutationMapping
-    public LoginResponse login(
-            @Argument String username,
-            @Argument String password) {
-
-        User user = userUseCase.login(username, password);
-
-        String token = jwtService.generateToken(user);
-
-        return new LoginResponse(token);
-    }
+//    @MutationMapping
+//    public LoginResponse login(
+//            @Argument String username,
+//            @Argument String password) {
+//
+//        User user = userUseCase.login(username, password);
+//
+//        String token = jwtService.generateToken(user);
+//
+//        return new LoginResponse(token);
+//    }
 
     private UserResponse toUserResponse(User user) {
         return new UserResponse(

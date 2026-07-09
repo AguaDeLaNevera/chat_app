@@ -46,8 +46,11 @@ public class UserUseCase {
         return userRepository.findAll();
     }
 
-    public List<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .stream()
+                .findFirst()
+                .orElseThrow(UserNotFoundException::new);
     }
 
     public String getUsernameWithId(int id) {

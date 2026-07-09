@@ -24,3 +24,10 @@ logging:
 jwt:
   secret: mySuperSecretKeyThatIsAtLeast32CharactersLong!
   expiration: 86400000
+
+keycloak:
+  url: http://localhost:9090
+  realm: chat
+  admin:
+    username: admin
+    password: admin

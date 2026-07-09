@@ -3,6 +3,7 @@ package com.example.chat.infrastructure.graphql;
 import com.example.chat.application.MessageUseCase;
 import com.example.chat.application.UserUseCase;
 import com.example.chat.domain.Message;
+import com.example.chat.domain.User;
 import com.example.chat.infrastructure.dto.MessageResponse;
 import com.example.chat.infrastructure.exceptions.InvalidCredentialsException;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -10,6 +11,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Controller;
 
 import java.time.Instant;
@@ -43,14 +45,18 @@ public class MessageResolver {
             @Argument String content,
             Authentication authentication) {
 
-        if(authentication == null){
+        if (authentication == null) {
             throw new InvalidCredentialsException();
         }
-        int userId = Integer.parseInt(authentication.getName());
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+
+        String username = jwt.getClaimAsString("preferred_username");
+        User user = userUseCase.findByUsername(username);
 
         Message message = messageUseCase.sendMessage(
                 0,
-                userId,
+                user.id(),
                 content,
                 Instant.now()
         );
