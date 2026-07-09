@@ -28,8 +28,6 @@ public class UserUseCase {
     public User createUser(String username, String password) {
         String encodedPassword = passwordEncoder.encode(password);
         if (userRepository.findByUsername(username)
-                .stream()
-                .findFirst()
                 .isPresent()
         ) {
             throw new UserAlreadyExistsException();

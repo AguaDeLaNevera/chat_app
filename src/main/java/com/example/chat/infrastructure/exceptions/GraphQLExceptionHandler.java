@@ -12,7 +12,8 @@ public class GraphQLExceptionHandler {
     @GraphQlExceptionHandler({
             UserAlreadyExistsException.class,
             UserNotFoundException.class,
-            InvalidCredentialsException.class
+            InvalidCredentialsException.class,
+            MessageNotFoundException.class
     })
     public GraphQLError handle(RuntimeException ex) {
         return GraphqlErrorBuilder.newError()
