@@ -11,6 +11,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Controller;
 
@@ -43,15 +44,14 @@ public class MessageResolver {
     @MutationMapping
     public Message sendMessage(
             @Argument String content,
-            Authentication authentication) {
+            @AuthenticationPrincipal Jwt authentication) {
 
         if (authentication == null) {
             throw new InvalidCredentialsException();
         }
 
-        Jwt jwt = (Jwt) authentication.getPrincipal();
 
-        String username = jwt.getClaimAsString("preferred_username");
+        String username = authentication.getClaimAsString("preferred_username");
         User user = userUseCase.findByUsername(username);
 
         Message message = messageUseCase.sendMessage(

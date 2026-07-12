@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("mongo")
-class MessageGraphQlE2ETest {
+class GraphQlE2ETest {
 
     @Autowired
     private UserMongoRepository userMongoRepository;
@@ -182,7 +182,6 @@ class MessageGraphQlE2ETest {
             return new KeycloakService(null) {
                 @Override
                 public void createUser(String username, String password) {
-                    // no-op for end-to-end tests
                 }
             };
         }

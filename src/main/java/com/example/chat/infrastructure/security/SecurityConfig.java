@@ -36,6 +36,8 @@ public class SecurityConfig {
                                 "/login.html",
                                 "/register/**",
                                 "/register.html",
+                                "/react/**",
+                                "/favicon.ico",
                                 "/chat/login",
                                 "/chat/register",
                                 "/graphql",
