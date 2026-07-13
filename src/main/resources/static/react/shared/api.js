@@ -1,7 +1,12 @@
 (() => {
   const GRAPHQL_URL = "/graphql";
-  const KEYCLOAK_TOKEN_URL =
+  const DEFAULT_KEYCLOAK_TOKEN_URL =
     "http://localhost:9090/realms/chat/protocol/openid-connect/token";
+
+  function getKeycloakTokenUrl() {
+    return (window.ChatConfig && window.ChatConfig.keycloakTokenUrl) ||
+      DEFAULT_KEYCLOAK_TOKEN_URL;
+  }
 
   async function graphqlRequest(query, token, variables = {}) {
     const headers = {
@@ -23,7 +28,7 @@
   }
 
   async function keycloakPasswordGrant(username, password) {
-    const response = await fetch(KEYCLOAK_TOKEN_URL, {
+    const response = await fetch(getKeycloakTokenUrl(), {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",

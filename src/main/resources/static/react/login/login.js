@@ -1,3 +1,5 @@
+import React from "react";
+
 const { getToken, keycloakPasswordGrant, setToken } = window.ChatApi;
 const { useEffect, useState } = React;
 const e = React.createElement;
@@ -16,12 +18,13 @@ function AuthPanel({ title, subtitle, children }) {
   );
 }
 
-function AuthField({ label, type, value, onChange, onEnter }) {
+function AuthField({ id, label, type, value, onChange, onEnter }) {
   return e(
     "div",
     { className: "field" },
-    e("label", null, label),
+    e("label", { htmlFor: id }, label),
     e("input", {
+      id,
       type,
       value,
       onChange: (event) => onChange(event.target.value),
@@ -85,6 +88,7 @@ function LoginApp() {
         "div",
         { className: "stack" },
         e(AuthField, {
+          id: "username",
           label: "Username",
           type: "text",
           value: username,
@@ -92,6 +96,7 @@ function LoginApp() {
           onEnter: login,
         }),
         e(AuthField, {
+          id: "password",
           label: "Password",
           type: "password",
           value: password,

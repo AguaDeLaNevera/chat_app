@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("mongo")
-class GraphQlE2ETest {
+class GraphQlIntegrationTest {
 
     @Autowired
     private UserMongoRepository userMongoRepository;
