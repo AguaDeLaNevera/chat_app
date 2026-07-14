@@ -1,5 +1,3 @@
-import React from "react";
-
 const { clearToken, getToken, graphqlRequest, parseJwt } = window.ChatApi;
 const { useEffect, useMemo, useRef, useState } = React;
 const e = React.createElement;

@@ -1,5 +1,3 @@
-import React from "react";
-
 const { getToken, keycloakPasswordGrant, setToken } = window.ChatApi;
 const { useEffect, useState } = React;
 const e = React.createElement;
