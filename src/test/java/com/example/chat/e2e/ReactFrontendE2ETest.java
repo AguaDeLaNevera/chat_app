@@ -116,19 +116,19 @@ class ReactFrontendE2ETest {
         String password = "secret123";
         String message = "hello from the browser";
 
-        open("/register.html");
+        open("/register");
         fill("username", username);
         fill("password", password);
         clickButton("Register");
 
-        wait.until(ExpectedConditions.urlContains("/react/login.html"));
+        wait.until(ExpectedConditions.urlContains("/login"));
 
         injectKeycloakTokenUrl();
         fill("username", username);
         fill("password", password);
         clickButton("Login");
 
-        wait.until(ExpectedConditions.urlContains("/react/index.html"));
+        wait.until(ExpectedConditions.urlContains("/chat"));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".chat-shell")));
 
@@ -143,16 +143,16 @@ class ReactFrontendE2ETest {
         assertTrue(driver.findElement(By.cssSelector(".messages")).getText().contains(message));
 
         clickButton("Logout");
-        wait.until(ExpectedConditions.urlContains("/react/login.html"));
+        wait.until(ExpectedConditions.urlContains("/login"));
     }
 
     @Test
     void incorrectCredentialsOnLogin() {
-        open("/login.html");
+        open("/login");
         fill("username", "wrong");
         fill("password", "wrong");
         clickButton("Login");
-        wait.until(ExpectedConditions.urlContains("/react/login.html"));
+        wait.until(ExpectedConditions.urlContains("/login"));
 
         WebElement error = wait.until(driver -> {
                     WebElement element = driver.findElement(By.className("error"));
@@ -165,7 +165,7 @@ class ReactFrontendE2ETest {
     }
 
     private void open(String path) {
-        driver.get("http://localhost:" + port + "/react" + path);
+        driver.get("http://localhost:" + port + path);
     }
 
     private void injectKeycloakTokenUrl() {

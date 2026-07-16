@@ -41,7 +41,8 @@ public class SecurityConfig {
                                 "/chat/login",
                                 "/chat/register",
                                 "/graphql",
-                                "/ws/**"
+                                "/ws/**",
+                                "/assets/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
