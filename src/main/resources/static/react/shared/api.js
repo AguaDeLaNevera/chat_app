@@ -4,11 +4,10 @@
     "http://localhost:9090/realms/chat/protocol/openid-connect/token";
 
   function getKeycloakTokenUrl() {
-    return (window.ChatConfig && window.ChatConfig.keycloakTokenUrl) ||
-      DEFAULT_KEYCLOAK_TOKEN_URL;
+    return window.ChatConfig?.keycloakTokenUrl ?? DEFAULT_KEYCLOAK_TOKEN_URL;
   }
 
-  async function graphqlRequest(query, token, variables = {}) {
+  async function graphqlRequest(query, token, variables = {}, signal = undefined) {
     const headers = {
       "Content-Type": "application/json",
     };
@@ -21,6 +20,7 @@
       method: "POST",
       headers,
       body: JSON.stringify({ query, variables }),
+      signal,
     });
 
     const payload = await response.json().catch(() => ({}));

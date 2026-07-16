@@ -17,6 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -29,9 +34,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("mongo")
 class GraphQlIntegrationTest {
+
+    private static final String MONGO_IMAGE = "mongo:7.0.14";
+
+    @Container
+    static final MongoDBContainer mongo = new MongoDBContainer(MONGO_IMAGE);
 
     @Autowired
     private UserMongoRepository userMongoRepository;
@@ -44,6 +55,11 @@ class GraphQlIntegrationTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newHttpClient();
+
+    @DynamicPropertySource
+    static void registerMongoProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
+    }
 
     @BeforeEach
     void setUp() {

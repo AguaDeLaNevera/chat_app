@@ -1,6 +1,8 @@
 package com.example.chat.e2e;
 
 import com.example.chat.infrastructure.keycloak.KeycloakService;
+import com.example.chat.infrastructure.mongo.message.MessageMongoRepository;
+import com.example.chat.infrastructure.mongo.user.UserMongoRepository;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterAll;
@@ -9,13 +11,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.Mock;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -30,17 +33,13 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,9 +60,17 @@ class ReactFrontendE2ETest {
     @Value("${local.server.port}")
     private int port;
 
+    @Autowired
+    private MessageMongoRepository messageMongoRepository;
+
+    @Autowired
+    private UserMongoRepository userMongoRepository;
+
     private WebDriver driver;
     private WebDriverWait wait;
     private int keycloakPort;
+
+    private static String authenticatedUsername;
 
     private static HttpServer keycloakServer;
 
@@ -89,7 +96,9 @@ class ReactFrontendE2ETest {
 
     @BeforeEach
     void setUp() {
-        driver = new ChromeDriver(chromeOptions());
+        messageMongoRepository.deleteAll();
+        userMongoRepository.deleteAll();
+        driver = new ChromeDriver();
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
@@ -102,7 +111,8 @@ class ReactFrontendE2ETest {
 
     @Test
     void userCanRegisterLoginSendMessageAndLogOut() {
-        String username = "e2e-" + UUID.randomUUID().toString().substring(0, 8);
+        String username = "riki" + Instant.now().toEpochMilli();
+        authenticatedUsername = username;
         String password = "secret123";
         String message = "hello from the browser";
 
@@ -229,7 +239,7 @@ class ReactFrontendE2ETest {
         JwtDecoder jwtDecoder() {
             return token -> Jwt.withTokenValue(token)
                     .header("alg", "none")
-                    .claim("preferred_username", "riki")
+                    .claim("preferred_username", authenticatedUsername)
                     .issuedAt(Instant.now())
                     .expiresAt(Instant.now().plusSeconds(3600))
                     .build();
@@ -242,7 +252,7 @@ class ReactFrontendE2ETest {
                 """);
         String payload = base64Url("""
                 {"preferred_username":"%s","sub":"%s"}
-                """.formatted("riki", "riki"));
+                """.formatted(authenticatedUsername, authenticatedUsername));
         return header + "." + payload + ".";
     }
 
@@ -250,34 +260,4 @@ class ReactFrontendE2ETest {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(value.strip().getBytes(StandardCharsets.UTF_8));
     }
 
-    private ChromeOptions chromeOptions() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
-        options.addArguments("--window-size=1440,1200");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--no-first-run");
-        options.addArguments("--no-default-browser-check");
-        options.setBinary(findChromeBinary().toString());
-        return options;
-    }
-
-    private Path findChromeBinary() {
-        String programFiles = System.getenv("ProgramFiles");
-        if (programFiles != null) {
-            Path primary = Path.of(programFiles, "Google", "Chrome", "Application", "chrome.exe");
-            if (Files.exists(primary)) {
-                return primary;
-            }
-        }
-
-        String programFilesX86 = System.getenv("ProgramFiles(x86)");
-        if (programFilesX86 != null) {
-            Path fallback = Path.of(programFilesX86, "Google", "Chrome", "Application", "chrome.exe");
-            if (Files.exists(fallback)) {
-                return fallback;
-            }
-        }
-
-        throw new IllegalStateException("Could not find chrome.exe");
-    }
 }
