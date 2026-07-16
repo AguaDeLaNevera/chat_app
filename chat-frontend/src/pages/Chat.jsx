@@ -15,7 +15,6 @@ const GET_MESSAGES_QUERY = `
       userId
       username
       content
-      sentAt
     }
   }
 `;

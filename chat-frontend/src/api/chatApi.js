@@ -3,7 +3,11 @@ const DEFAULT_KEYCLOAK_TOKEN_URL =
   "http://localhost:9090/realms/chat/protocol/openid-connect/token";
 
 function getKeycloakTokenUrl() {
-  return window.ChatConfig?.keycloakTokenUrl ?? DEFAULT_KEYCLOAK_TOKEN_URL;
+  return (
+    window.ChatConfig?.keycloakTokenUrl ??
+    import.meta.env.VITE_KEYCLOAK_TOKEN_URL ??
+    DEFAULT_KEYCLOAK_TOKEN_URL
+  );
 }
 
 export async function graphqlRequest(query, token, variables = {}, signal = undefined) {

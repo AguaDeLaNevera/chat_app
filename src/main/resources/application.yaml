@@ -1,6 +1,8 @@
 spring:
   application:
     name: chat
+  config:
+    import: optional:file:.env[.properties]
 
   profiles:
     active: mongo
@@ -13,7 +15,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:9090/realms/chat
+          issuer-uri: ${APP_KEYCLOAK_ISSUER_URI:http://localhost:9090/realms/chat}
 
 
 
@@ -26,8 +28,8 @@ jwt:
   expiration: 86400000
 
 keycloak:
-  url: http://localhost:9090
-  realm: chat
+  url: ${KEYCLOAK_URL:http://localhost:9090}
+  realm: ${KEYCLOAK_REALM:chat}
   admin:
-    username: admin
-    password: admin
+    username: ${KEYCLOAK_ADMIN_USERNAME:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:admin}

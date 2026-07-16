@@ -51,7 +51,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ReactFrontendE2ETest {
 
-    private static final String KEYCLOAK_TOKEN_PATH = "/realms/chat/protocol/openid-connect/token";
     private static final String MONGO_IMAGE = "mongo:7.0.14";
 
     @Container
@@ -59,6 +58,18 @@ class ReactFrontendE2ETest {
 
     @Value("${local.server.port}")
     private int port;
+
+    @Value("${APP_FRONTEND_LOGIN_PATH:/login}")
+    private String loginPath;
+
+    @Value("${APP_FRONTEND_REGISTER_PATH:/register}")
+    private String registerPath;
+
+    @Value("${APP_FRONTEND_CHAT_PATH:/chat}")
+    private String chatPath;
+
+    @Value("${APP_KEYCLOAK_TOKEN_PATH:/realms/chat/protocol/openid-connect/token}")
+    private String keycloakTokenPath;
 
     @Autowired
     private MessageMongoRepository messageMongoRepository;
@@ -82,7 +93,7 @@ class ReactFrontendE2ETest {
     @BeforeAll
     void startKeycloakStub() throws IOException {
         keycloakServer = HttpServer.create(new InetSocketAddress(0), 0);
-        keycloakServer.createContext(KEYCLOAK_TOKEN_PATH, this::handleTokenRequest);
+        keycloakServer.createContext(keycloakTokenPath, this::handleTokenRequest);
         keycloakServer.start();
         keycloakPort = keycloakServer.getAddress().getPort();
     }
@@ -116,19 +127,19 @@ class ReactFrontendE2ETest {
         String password = "secret123";
         String message = "hello from the browser";
 
-        open("/register");
+        open(registerPath);
         fill("username", username);
         fill("password", password);
         clickButton("Register");
 
-        wait.until(ExpectedConditions.urlContains("/login"));
+        wait.until(ExpectedConditions.urlContains(loginPath));
 
         injectKeycloakTokenUrl();
         fill("username", username);
         fill("password", password);
         clickButton("Login");
 
-        wait.until(ExpectedConditions.urlContains("/chat"));
+        wait.until(ExpectedConditions.urlContains(chatPath));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".chat-shell")));
 
@@ -143,16 +154,16 @@ class ReactFrontendE2ETest {
         assertTrue(driver.findElement(By.cssSelector(".messages")).getText().contains(message));
 
         clickButton("Logout");
-        wait.until(ExpectedConditions.urlContains("/login"));
+        wait.until(ExpectedConditions.urlContains(loginPath));
     }
 
     @Test
     void incorrectCredentialsOnLogin() {
-        open("/login");
+        open(loginPath);
         fill("username", "wrong");
         fill("password", "wrong");
         clickButton("Login");
-        wait.until(ExpectedConditions.urlContains("/login"));
+        wait.until(ExpectedConditions.urlContains(loginPath));
 
         WebElement error = wait.until(driver -> {
                     WebElement element = driver.findElement(By.className("error"));
@@ -169,7 +180,7 @@ class ReactFrontendE2ETest {
     }
 
     private void injectKeycloakTokenUrl() {
-        String tokenUrl = "http://localhost:" + keycloakPort + KEYCLOAK_TOKEN_PATH;
+        String tokenUrl = "http://localhost:" + keycloakPort + keycloakTokenPath;
         ((org.openqa.selenium.JavascriptExecutor) driver).executeScript(
                 "window.ChatConfig = { keycloakTokenUrl: arguments[0] };",
                 tokenUrl

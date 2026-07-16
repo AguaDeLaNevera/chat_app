@@ -8,9 +8,9 @@ public class SpaController {
 
     @GetMapping({
             "/",
-            "/login",
-            "/register",
-            "/chat"
+            "${APP_FRONTEND_LOGIN_PATH:/login}",
+            "${APP_FRONTEND_REGISTER_PATH:/register}",
+            "${APP_FRONTEND_CHAT_PATH:/chat}"
     })
     public String index() {
         return "forward:/index.html";

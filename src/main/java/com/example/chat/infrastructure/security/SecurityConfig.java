@@ -2,6 +2,7 @@ package com.example.chat.infrastructure.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -10,17 +11,22 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    //private final JwtFilter jwtFilter;
+    @Value("${APP_FRONTEND_LOGIN_PATH:/login}")
+    private String loginPath;
 
-//    public SecurityConfig(JwtFilter jwtFilter) {
-//        this.jwtFilter = jwtFilter;
-//    }
+    @Value("${APP_FRONTEND_REGISTER_PATH:/register}")
+    private String registerPath;
+
+    @Value("${APP_FRONTEND_CHAT_PATH:/chat}")
+    private String chatPath;
+
+    @Value("${APP_FRONTEND_INDEX_PATH:/index.html}")
+    private String indexPath;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -31,22 +37,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
-                                "/index.html",
-                                "/login/**",
-                                "/login.html",
-                                "/register/**",
-                                "/register.html",
-                                "/react/**",
+                                indexPath,
+                                loginPath,
+                                loginPath + "/**",
+                                registerPath,
+                                registerPath + "/**",
+                                chatPath,
                                 "/favicon.ico",
-                                "/chat/login",
-                                "/chat/register",
                                 "/graphql",
                                 "/ws/**",
                                 "/assets/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                //.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
                 .build();
     }
